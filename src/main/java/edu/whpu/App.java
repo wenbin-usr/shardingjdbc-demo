@@ -90,6 +90,11 @@ public class App {
                     System.out.println(rs.getString("name"));
                 }
             }
+
+
+            sql = "update student set age = 27 where id = 24";
+            PreparedStatement ps1 = conn.prepareStatement(sql);
+            System.out.println(ps1.executeUpdate());
         }
 
     }
