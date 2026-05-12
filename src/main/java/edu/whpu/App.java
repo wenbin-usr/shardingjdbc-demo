@@ -60,12 +60,12 @@ public class App {
 
         // 构建读写分离规则
         ReadwriteSplittingDataSourceGroupRuleConfiguration dataSourceConfig = new ReadwriteSplittingDataSourceGroupRuleConfiguration(
-                "ds_readwrite", "ds_master", Arrays.asList("ds_slave1", "ds_slave2"), "demo_weight_lb");
-        Properties algorithmProps = new Properties();
-        algorithmProps.setProperty("ds_slave1", "1");
-        algorithmProps.setProperty("ds_slave2", "2");
-        Map<String, AlgorithmConfiguration> algorithmConfigMap = new HashMap<>(2);
-        algorithmConfigMap.put("demo_weight_lb", new AlgorithmConfiguration("WEIGHT", algorithmProps));
+                "ds_readwrite", "ds_master", Arrays.asList("ds_slave1", "ds_slave2"), "demo_random_lb");
+//        Properties algorithmProps = new Properties();
+//        algorithmProps.setProperty("ds_slave1", "1");
+//        algorithmProps.setProperty("ds_slave2", "2");
+        Map<String, AlgorithmConfiguration> algorithmConfigMap = new HashMap<>();
+        algorithmConfigMap.put("demo_random_lb", new AlgorithmConfiguration("RANDOM", new Properties()));
         ReadwriteSplittingRuleConfiguration ruleConfig = new ReadwriteSplittingRuleConfiguration(Collections.singleton(dataSourceConfig), algorithmConfigMap);
 
         // 单表规则：5.4+ 需显式声明要加载的单表，否则元数据里不存在该表，会 TableNotFoundException
@@ -93,11 +93,6 @@ public class App {
                     System.out.println(student);
                 }
             }
-
-
-            sql = "update student set age = 27 where id = 24";
-            PreparedStatement ps1 = conn.prepareStatement(sql);
-            System.out.println(ps1.executeUpdate());
         }
 
     }
