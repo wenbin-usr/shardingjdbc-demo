@@ -83,11 +83,14 @@ public class App {
         String sql = "SELECT * from student";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-//            ps.setInt(1, 10);
-//            ps.setInt(2, 1000);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
-                    System.out.println(rs.getString("name"));
+                    Student student = new Student();
+                    student.setId(rs.getLong("id"));
+                    student.setStuno(rs.getString("stuno"));
+                    student.setAge(rs.getInt("age"));
+                    student.setName(rs.getString("name"));
+                    System.out.println(student);
                 }
             }
 
