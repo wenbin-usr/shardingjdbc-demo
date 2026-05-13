@@ -60,12 +60,12 @@ public class App {
 
         // 构建读写分离规则
         ReadwriteSplittingDataSourceGroupRuleConfiguration dataSourceConfig = new ReadwriteSplittingDataSourceGroupRuleConfiguration(
-                "ds_readwrite", "ds_master", Arrays.asList("ds_slave1", "ds_slave2"), "demo_random_lb");
+                "ds_readwrite", "ds_master", Arrays.asList("ds_slave1", "ds_slave2"), "lb_round_robin");
 //        Properties algorithmProps = new Properties();
 //        algorithmProps.setProperty("ds_slave1", "1");
 //        algorithmProps.setProperty("ds_slave2", "2");
         Map<String, AlgorithmConfiguration> algorithmConfigMap = new HashMap<>();
-        algorithmConfigMap.put("demo_random_lb", new AlgorithmConfiguration("RANDOM", new Properties()));
+        algorithmConfigMap.put("lb_round_robin", new AlgorithmConfiguration("ROUND_ROBIN", new Properties()));
         ReadwriteSplittingRuleConfiguration ruleConfig = new ReadwriteSplittingRuleConfiguration(Collections.singleton(dataSourceConfig), algorithmConfigMap);
 
         // 单表规则：5.4+ 需显式声明要加载的单表，否则元数据里不存在该表，会 TableNotFoundException
@@ -78,9 +78,84 @@ public class App {
         props.setProperty(ConfigurationPropertyKey.SQL_SHOW.getKey(), "true");
 
         Collection<RuleConfiguration> rules = Arrays.asList(ruleConfig, singleRuleConfig);
-        DataSource dataSource = ShardingSphereDataSourceFactory.createDataSource(modeConfiguration, dataSourceMap, rules, props);
+        DataSource dataSource = ShardingSphereDataSourceFactory.createDataSource("demo_db", modeConfiguration, dataSourceMap, rules, props);
 
-        String sql = "SELECT * from student";
+        String sql = "SELECT * from student where id = 22";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Student student = new Student();
+                    student.setId(rs.getLong("id"));
+                    student.setStuno(rs.getString("stuno"));
+                    student.setAge(rs.getInt("age"));
+                    student.setName(rs.getString("name"));
+                    System.out.println(student);
+                }
+            }
+        }
+
+        sql = "SELECT * from student where id = 23";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Student student = new Student();
+                    student.setId(rs.getLong("id"));
+                    student.setStuno(rs.getString("stuno"));
+                    student.setAge(rs.getInt("age"));
+                    student.setName(rs.getString("name"));
+                    System.out.println(student);
+                }
+            }
+        }
+
+        sql = "SELECT * from student where id = 24";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Student student = new Student();
+                    student.setId(rs.getLong("id"));
+                    student.setStuno(rs.getString("stuno"));
+                    student.setAge(rs.getInt("age"));
+                    student.setName(rs.getString("name"));
+                    System.out.println(student);
+                }
+            }
+        }
+
+        sql = "SELECT * from student where id = 25";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Student student = new Student();
+                    student.setId(rs.getLong("id"));
+                    student.setStuno(rs.getString("stuno"));
+                    student.setAge(rs.getInt("age"));
+                    student.setName(rs.getString("name"));
+                    System.out.println(student);
+                }
+            }
+        }
+
+        sql = "SELECT * from student where id = 26";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Student student = new Student();
+                    student.setId(rs.getLong("id"));
+                    student.setStuno(rs.getString("stuno"));
+                    student.setAge(rs.getInt("age"));
+                    student.setName(rs.getString("name"));
+                    System.out.println(student);
+                }
+            }
+        }
+
+        sql = "SELECT * from student where id = 27";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {

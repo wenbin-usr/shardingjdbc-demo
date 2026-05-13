@@ -4,6 +4,7 @@ import org.apache.shardingsphere.driver.api.yaml.YamlShardingSphereDataSourceFac
 
 import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
