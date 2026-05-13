@@ -1,0 +1,52 @@
+# ShardingSphere-JDBC 分库分表示例：数据节点 ds_${0..1}.student_${0..1}（共 4 个物理表）
+# 库键、表键均为 id：库 = id.intdiv(2) % 2，表 = id % 2，可均匀命中四个节点（0,1,2,3 -> 四格）
+# 文档：https://shardingsphere.apache.org/document/5.5.2/en/user-manual/shardingsphere-jdbc/yaml-config/rules/sharding/
+#
+# 请在 ds_0（本例 3307）、ds_1（本例 3308）的 db_test 中各建 student_0、student_1，见 sql/init-sharding-student-tables.sql
+
+databaseName: sharding_db_table_demo
+
+mode:
+  type: Standalone
+  repository:
+    type: JDBC
+
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://1.15.233.144:3307/db_test?serverTimezone=UTC&useSSL=false
+    username: root
+    password: "123456"
+  ds_1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://1.15.233.144:3308/db_test?serverTimezone=UTC&useSSL=false
+    username: root
+    password: "123456"
+
+rules:
+  - !SHARDING
+    tables:
+      student:
+        actualDataNodes: ds_${0..1}.student_${0..1}
+        databaseStrategy:
+          standard:
+            shardingColumn: id
+            shardingAlgorithmName: student_database_inline
+        tableStrategy:
+          standard:
+            shardingColumn: id
+            shardingAlgorithmName: student_table_inline
+    shardingAlgorithms:
+      student_database_inline:
+        type: INLINE
+        props:
+          algorithm-expression: ds_${id.intdiv(2) % 2}
+      student_table_inline:
+        type: INLINE
+        props:
+          algorithm-expression: student_${id % 2}
+
+props:
+  sql-show: true
