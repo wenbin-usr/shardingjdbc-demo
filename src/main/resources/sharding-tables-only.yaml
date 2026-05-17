@@ -15,29 +15,29 @@ dataSources:
   ds_0:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://1.15.233.144:3307/db_test?serverTimezone=UTC&useSSL=false
+    jdbcUrl: jdbc:mysql://1.15.233.144:3307/db_order?serverTimezone=UTC&useSSL=false
     username: root
     password: "123456"
   ds_1:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://1.15.233.144:3308/db_test?serverTimezone=UTC&useSSL=false
+    jdbcUrl: jdbc:mysql://47.106.155.227:3306/db_order?serverTimezone=UTC&useSSL=false
     username: root
     password: "123456"
 
 rules:
   - !SHARDING
     tables:
-      student:
-        actualDataNodes: ds_${0..1}.student_${0..1}
+      t_order:
+        actualDataNodes: ds_${0..1}.t_order{0..1}
         databaseStrategy:
           standard:
             shardingColumn: id
-            shardingAlgorithmName: student_database_inline
+            shardingAlgorithmName: order_database_inline
         tableStrategy:
           standard:
             shardingColumn: id
-            shardingAlgorithmName: student_table_inline
+            shardingAlgorithmName: order_table_inline
     shardingAlgorithms:
       student_database_inline:
         type: INLINE
@@ -46,7 +46,7 @@ rules:
       student_table_inline:
         type: INLINE
         props:
-          algorithm-expression: student_${id % 2}
+          algorithm-expression: db_order_${id % 2}
 
 props:
   sql-show: true
