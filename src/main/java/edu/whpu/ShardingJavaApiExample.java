@@ -23,7 +23,8 @@ import java.util.Properties;
 
 /**
  * 与 {@code sharding-tables-only.yaml} 等价的 Java API 分库分表配置：节点 {@code ds${0..1}.t_order${0..1}}，
- * 库策略为 {@code user_id} + INLINE（库 {@code user_id % 2}），表策略为 {@code order_no} + INLINE（表 {@code Math.abs(order_no.hashCode()) % 2}）。
+ * 库策略为 {@code user_id} + INLINE（库 {@code user_id % 2}），表策略为 {@code order_no} + INLINE（{@code hashCode % 2}）。
+ * <p>说明：{@code HASH_MOD}/{@code MOD} 属于自动分片算法，只能配在 {@code autoTables} 上；本示例使用 {@code actualDataNodes} 手动节点，表分片须用 INLINE。
  */
 public final class ShardingJavaApiExample {
 
@@ -32,6 +33,7 @@ public final class ShardingJavaApiExample {
                 "Standalone",
                 new StandalonePersistRepositoryConfiguration("JDBC", new Properties()));
 
+        // 两个物理库，逻辑上通过分片规则映射为 ds0、ds1
         Map<String, DataSource> dataSourceMap = new HashMap<>(2);
         HikariDataSource ds0 = new HikariDataSource();
         ds0.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -47,11 +49,15 @@ public final class ShardingJavaApiExample {
         ds1.setPassword("123456");
         dataSourceMap.put("ds1", ds1);
 
+        // 手动分表：显式声明 4 个数据节点（2 库 × 2 表），须配合 INLINE 等「标准」分片算法
+        // 不能使用 HASH_MOD/MOD：自 5.4.1 起它们属于自动分片算法，只能用于 autoTables
         ShardingTableRuleConfiguration orderTable = new ShardingTableRuleConfiguration(
                 "t_order",
                 "ds${0..1}.t_order${0..1}");
+        // 分库：按 user_id 取余路由到 ds0 / ds1
         orderTable.setDatabaseShardingStrategy(
                 new StandardShardingStrategyConfiguration("user_id", "alg_inline_userid"));
+        // 分表：按 order_no 哈希取模路由到 t_order0 / t_order1
         orderTable.setTableShardingStrategy(
                 new StandardShardingStrategyConfiguration("order_no", "alg_hash_mod_order_no"));
 
@@ -62,11 +68,14 @@ public final class ShardingJavaApiExample {
         databaseInlineProps.setProperty("algorithm-expression", "ds$->{user_id % 2}");
         shardingRuleConfiguration.getShardingAlgorithms().put("alg_inline_userid", new AlgorithmConfiguration("INLINE", databaseInlineProps));
 
+        // 表分片用 INLINE 实现 hashCode % 2，效果与 HASH_MOD(sharding-count=2) 对 String 相同
+        // 若要用 HASH_MOD，需改为 ShardingAutoTableRuleConfiguration + autoTables，且物理表名规则可能变化
         Properties tableInlineProps = new Properties();
         tableInlineProps.setProperty("algorithm-expression", "t_order$->{Math.abs(order_no.hashCode()) % 2}");
         shardingRuleConfiguration.getShardingAlgorithms().put("alg_hash_mod_order_no", new AlgorithmConfiguration("INLINE", tableInlineProps));
 
         Properties props = new Properties();
+        // 打印逻辑 SQL / 实际 SQL（输出到 ShardingSphere-SQL 日志，需配置 logback）
         props.setProperty(ConfigurationPropertyKey.SQL_SHOW.getKey(), "true");
 
         Collection<RuleConfiguration> rules = Collections.singletonList(shardingRuleConfiguration);
