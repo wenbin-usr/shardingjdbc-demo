@@ -60,15 +60,11 @@ public final class ShardingJavaApiExample {
 
         Properties databaseInlineProps = new Properties();
         databaseInlineProps.setProperty("algorithm-expression", "ds$->{user_id % 2}");
-        shardingRuleConfiguration.getShardingAlgorithms().put(
-                "alg_inline_userid",
-                new AlgorithmConfiguration("INLINE", databaseInlineProps));
+        shardingRuleConfiguration.getShardingAlgorithms().put("alg_inline_userid", new AlgorithmConfiguration("INLINE", databaseInlineProps));
 
         Properties tableInlineProps = new Properties();
         tableInlineProps.setProperty("algorithm-expression", "t_order$->{Math.abs(order_no.hashCode()) % 2}");
-        shardingRuleConfiguration.getShardingAlgorithms().put(
-                "alg_hash_mod_order_no",
-                new AlgorithmConfiguration("INLINE", tableInlineProps));
+        shardingRuleConfiguration.getShardingAlgorithms().put("alg_hash_mod_order_no", new AlgorithmConfiguration("INLINE", tableInlineProps));
 
         Properties props = new Properties();
         props.setProperty(ConfigurationPropertyKey.SQL_SHOW.getKey(), "true");
