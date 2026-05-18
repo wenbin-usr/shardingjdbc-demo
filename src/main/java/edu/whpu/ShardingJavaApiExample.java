@@ -47,16 +47,16 @@ public final class ShardingJavaApiExample {
         ds1.setPassword("123456");
         dataSourceMap.put("ds1", ds1);
 
-        ShardingTableRuleConfiguration studentTable = new ShardingTableRuleConfiguration(
+        ShardingTableRuleConfiguration orderTable = new ShardingTableRuleConfiguration(
                 "t_order",
                 "ds${0..1}.t_order${0..1}");
-        studentTable.setDatabaseShardingStrategy(
+        orderTable.setDatabaseShardingStrategy(
                 new StandardShardingStrategyConfiguration("user_id", "alg_inline_userid"));
-        studentTable.setTableShardingStrategy(
+        orderTable.setTableShardingStrategy(
                 new StandardShardingStrategyConfiguration("order_no", "alg_hash_mod_order_no"));
 
         ShardingRuleConfiguration shardingRuleConfiguration = new ShardingRuleConfiguration();
-        shardingRuleConfiguration.getTables().add(studentTable);
+        shardingRuleConfiguration.getTables().add(orderTable);
 
         Properties databaseInlineProps = new Properties();
         databaseInlineProps.setProperty("algorithm-expression", "ds$->{user_id % 2}");
